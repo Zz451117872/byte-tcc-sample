@@ -8,7 +8,5 @@ public interface IUserService {
 
     public boolean updateAmount( Integer uid , Integer amount);
 
-    boolean decreaseAmount(Integer uid, Integer amount);
-
-    boolean increaseAmount(Integer uid, Integer amount);
+    public boolean updateFreeze( Integer uid , Integer freeze);
 }

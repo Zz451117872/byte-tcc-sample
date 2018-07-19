@@ -1,9 +1,12 @@
 package com.zhang.bytetccorder.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity(name = "order1")
+@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"})
 public class Order implements Serializable {
 
     @Id

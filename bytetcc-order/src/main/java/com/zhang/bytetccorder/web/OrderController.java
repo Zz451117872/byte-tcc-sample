@@ -12,29 +12,63 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class OrderController {
 
     @Autowired
-    private IOrderService orderService;
+    private IOrderService orderServiceTry;
+
+    @Autowired
+    private IOrderService orderServiceConfirm;
+
+    @Autowired
+    private IOrderService orderServiceCancle;
 
     @RequestMapping("selectOne")
     @ResponseBody
-    public Order selectOne(Integer oid){
-        return orderService.selectOne( oid );
+    public Object selectOne(Integer oid){
+        Order order =  orderServiceTry.selectOne( oid );
+        if( order != null ){
+            return order;
+        }
+        return 1;
     }
 
     @RequestMapping("createOrder")
     @ResponseBody
     public Order createOrder( Integer uid , Integer pid , Integer quantity){
-        return orderService.createOrder( uid , pid , quantity );
+        try{
+            try{
+                orderServiceTry.createOrder( uid , pid , quantity );
+            }catch (Exception e){
+                return null;
+            }
+            return orderServiceConfirm.createOrder( uid ,pid , quantity );
+        }catch (Exception e2){
+            orderServiceCancle.createOrder( uid , pid , quantity );
+        }
+        return null;
     }
 
     @RequestMapping("payOrder")
     @ResponseBody
     public boolean payOrder( Integer oid ){
-        return orderService.payOrder( oid );
+        try{
+            if( orderServiceTry.payOrder( oid )){
+                return orderServiceConfirm.payOrder( oid );
+            }
+        }catch (Exception e){
+            orderServiceCancle.payOrder( oid );
+        }
+        return false;
     }
 
     @RequestMapping("cancleOrder")
     @ResponseBody
     public boolean cancleOrder( Integer oid ){
-        return orderService.cancleOrder( oid );
+        try{
+            if( orderServiceTry.cancleOrder( oid )){
+                return orderServiceConfirm.cancleOrder( oid );
+            }
+        }catch (Exception e){
+            orderServiceCancle.cancleOrder( oid );
+        }
+        return false;
     }
 }

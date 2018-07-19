@@ -1,10 +1,13 @@
 package com.zhang.bytetccproduct.web;
 
+import com.zhang.bytetcccommon.DTO.ProductDto;
 import com.zhang.bytetccproduct.dao.ProductDao;
 import com.zhang.bytetccproduct.domain.Product;
 import com.zhang.bytetccproduct.service.IProductService;
+import org.bytesoft.compensable.Compensable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -13,47 +16,69 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ProductController {
 
     @Autowired
-    private IProductService productService;
+    private IProductService productServiceTry;
+
+    @Autowired
+    private IProductService productServiceConfirm;
+
+    @Autowired
+    private IProductService productServiceCancle;
 
     @RequestMapping("/selectOne")
     @ResponseBody
-    public Product selectOne( Integer pid ){
-        return  productService.selectOne( pid );
+    public ProductDto selectOne(Integer pid ){
+        Product product =  productServiceTry.selectOne( pid );
+        if( product != null ){
+            ProductDto productDto = new ProductDto();
+            productDto.setFreeze( product.getFreeze() );
+            productDto.setName( product.getName() );
+            productDto.setPid( product.getPid() );
+            productDto.setPrice( product.getPrice() );
+            productDto.setQuantity( product.getQuantity() );
+            productDto.setVersion( product.getVersion() );
+            return productDto;
+        }
+        return null;
     }
 
     @RequestMapping("/updateQuantity")
     @ResponseBody
     public boolean updateQuantity( Integer pid , Integer quantity ){
-        return productService.updateQuantity( pid , quantity);
-    }
-
-    @RequestMapping("/decreaseQuantity")
-    @ResponseBody
-    public boolean decreaseQuantity( Integer pid , Integer quantity ){
-        return productService.decreaseQuantity( pid , quantity);
-    }
-
-    @RequestMapping("/increaseQuantity")
-    @ResponseBody
-    public boolean increaseQuantity( Integer pid , Integer quantity ){
-        return productService.increaseQuantity( pid , quantity);
+        try{
+            if( productServiceTry.updateQuantity( pid , quantity)){
+                 return productServiceConfirm.updateQuantity( pid ,quantity );
+            }
+        }catch (Exception e){
+            productServiceCancle.updateQuantity( pid , quantity );
+        }
+        return false;
     }
 
     @RequestMapping("/updateFreeze")
     @ResponseBody
-    public boolean updateFreeze( Integer pid , Integer quantity ){
-        return productService.updateFreeze( pid , quantity);
+    public boolean updateFreeze( Integer pid , Integer freeze ){
+        try{
+            if( productServiceTry.updateQuantity( pid , freeze )){
+                return productServiceConfirm.updateQuantity( pid ,freeze );
+            }
+        }catch (Exception e){
+            productServiceCancle.updateQuantity( pid , freeze );
+        }
+        return false;
     }
 
-    @RequestMapping("/decreaseFreeze")
+    @RequestMapping("/releaseQuantity")
     @ResponseBody
-    public boolean decreaseFreeze( Integer pid , Integer quantity ){
-        return productService.decreaseFreeze( pid , quantity);
+    public boolean releaseQuantity( Integer pid , Integer quantity ){
+        try{
+            if( productServiceTry.releaseQuantity( pid , quantity )){
+                return productServiceConfirm.releaseQuantity( pid , quantity );
+            }
+        }catch (Exception e){
+            productServiceCancle.releaseQuantity( pid , quantity );
+        }
+        return false;
     }
 
-    @RequestMapping("/increaseFreeze")
-    @ResponseBody
-    public boolean increaseFreeze( Integer pid , Integer quantity ){
-        return productService.increaseFreeze( pid , quantity);
-    }
+
 }

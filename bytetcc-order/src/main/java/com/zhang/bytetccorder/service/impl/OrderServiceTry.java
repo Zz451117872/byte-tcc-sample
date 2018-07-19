@@ -14,13 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
-@Service("orderService")
-@Compensable(
-        interfaceClass = IOrderService.class,
-        cancellableKey = "orderServiceCancle",
-        confirmableKey = "orderServiceConfirm"
-)
-public class OrderServiceImpl implements IOrderService {
+@Service("orderServiceTry")
+@Transactional
+public class OrderServiceTry implements IOrderService {
 
     @Autowired
     private OrderDao orderDao;
@@ -32,7 +28,6 @@ public class OrderServiceImpl implements IOrderService {
     private ProductFeignService productFeignService;
 
     @Override
-    @Transactional
     public Order createOrder(Integer uid, Integer pid, Integer quantity) {
         /**
          * 1.判断库存
@@ -42,7 +37,7 @@ public class OrderServiceImpl implements IOrderService {
         if( productDto.getQuantity() < quantity ){
             throw new RuntimeException("库存不够");
         }
-        if( ! productFeignService.decreaseQuantity( pid , quantity )){
+        if( ! productFeignService.updateQuantity( pid , quantity )){
             throw new RuntimeException("预减订单失败");
         }
         return null;
@@ -59,7 +54,7 @@ public class OrderServiceImpl implements IOrderService {
         if( user.getAmount() < order.getTotalPrice() ){
             throw new RuntimeException("余额不够");
         }
-        if( ! userFeignService.decreaseAmount( order.getUid() , order.getTotalPrice() ) ){
+        if( ! userFeignService.updateAmount( order.getUid() , order.getTotalPrice() ) ){
             throw new RuntimeException("预减余额失败");
         }
         return true;
@@ -75,7 +70,7 @@ public class OrderServiceImpl implements IOrderService {
         if( !"未付款".equals( order.getStatus() )){
             throw new RuntimeException(" 订单状态为：" + order.getStatus()+" 无法取消订单");
         }
-        if( !productFeignService.decreaseFreeze( order.getPid() , order.getQuantity() )){
+        if( !productFeignService.releaseQuantity( order.getPid() , order.getQuantity() )){
             throw new RuntimeException("预释放库存失败");
         }
         return true;

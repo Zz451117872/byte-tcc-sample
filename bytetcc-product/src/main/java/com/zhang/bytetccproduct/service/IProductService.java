@@ -4,17 +4,12 @@ import com.zhang.bytetccproduct.domain.Product;
 
 public interface IProductService {
 
-    public Product selectOne( Integer pid );
+    Product selectOne( Integer pid );
 
-    public boolean updateQuantity( Integer pid , Integer amount );
+    boolean updateQuantity( Integer pid , Integer amount );
 
-    boolean decreaseFreeze(Integer pid, Integer quantity);
+    boolean updateFreeze(Integer pid, Integer freeze);
 
-    boolean increaseFreeze(Integer pid, Integer quantity);
+    boolean releaseQuantity(Integer pid, Integer quantity);
 
-    boolean updateFreeze(Integer pid, Integer quantity);
-
-    boolean increaseQuantity(Integer pid, Integer quantity);
-
-    boolean decreaseQuantity(Integer pid, Integer quantity);
 }

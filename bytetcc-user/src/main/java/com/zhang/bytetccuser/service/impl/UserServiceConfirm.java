@@ -5,8 +5,10 @@ import com.zhang.bytetccuser.domain.User;
 import com.zhang.bytetccuser.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("userServiceConfirm")
+@Transactional
 public class UserServiceConfirm implements IUserService {
 
     @Autowired
@@ -14,21 +16,18 @@ public class UserServiceConfirm implements IUserService {
 
     @Override
     public User selectOne(Integer uid) {
-        return null;
+        return userDao.getOne( uid );
     }
 
     @Override
     public boolean updateAmount(Integer uid, Integer amount) {
-        return false;
+        return userDao.confirmUpdateAmount( uid , amount ) > 0 ;
     }
 
     @Override
-    public boolean decreaseAmount(Integer uid, Integer amount) {
-        return false;
+    public boolean updateFreeze(Integer uid, Integer freeze) {
+        return userDao.confirmUpdateFreeze( uid ,freeze ) > 0 ;
     }
 
-    @Override
-    public boolean increaseAmount(Integer uid, Integer amount) {
-        return false;
-    }
+
 }

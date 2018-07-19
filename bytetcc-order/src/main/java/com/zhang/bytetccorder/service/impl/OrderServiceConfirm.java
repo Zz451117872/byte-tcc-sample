@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 
 @Service("orderServiceConfirm")
+@Transactional
 public class OrderServiceConfirm implements IOrderService {
 
     @Autowired
@@ -26,7 +27,6 @@ public class OrderServiceConfirm implements IOrderService {
     private ProductFeignService productFeignService;
 
     @Override
-    @Transactional
     public Order createOrder(Integer uid, Integer pid, Integer quantity) {
 
         ProductDto productDto = productFeignService.selectOne( pid );
@@ -34,9 +34,9 @@ public class OrderServiceConfirm implements IOrderService {
         Order order = new Order();
         order.setPid( pid );
         order.setPrice( productDto.getPrice() );
-        order.setQuantity( productDto.getQuantity() );
+        order.setQuantity( quantity );
         order.setStatus( "未付款");
-        order.setTotalPrice( productDto.getPrice() * productDto.getQuantity() );
+        order.setTotalPrice( productDto.getPrice() * quantity );
         order.setUid( uid );
         order.setVersion( new Date().getTime() );
 
@@ -48,24 +48,23 @@ public class OrderServiceConfirm implements IOrderService {
     public boolean payOrder(Integer oid) {
 
         Order order = orderDao.getOne( oid );
-        UserDto user = userFeignService.selectOne( order.getUid() );
-        if( ! userFeignService.updateAmount( order.getUid() , order.getTotalPrice() ) ){
-            throw new RuntimeException("更新余额失败");
-        }
+        order.setStatus( "已支付");
+        order.setVersion( new Date().getTime() );
+        orderDao.save( order );
         return true;
     }
 
     @Override
     public boolean cancleOrder(Integer oid) {
         Order order = orderDao.getOne( oid );
-        if( ! productFeignService.updateFreeze( order.getPid() , order.getQuantity() )){
-            throw new RuntimeException("更新冻结库存失败");
-        }
+        order.setStatus( "已取消");
+        order.setVersion( new Date().getTime() );
+        orderDao.save( order );
         return true;
     }
 
     @Override
     public Order selectOne(Integer oid) {
-        return null;
+        return orderDao.getOne( oid );
     }
 }

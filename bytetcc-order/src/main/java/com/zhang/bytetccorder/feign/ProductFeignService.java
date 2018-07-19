@@ -13,22 +13,13 @@ public interface ProductFeignService {
     @GetMapping("/selectOne")
     public ProductDto selectOne(@RequestParam("pid")Integer pid);
 
-    @GetMapping("/decreaseQuantity")
-    public boolean decreaseQuantity( @RequestParam("pid")Integer pid , @RequestParam("quantity")Integer quantity);
-
-    @GetMapping("/increaseQuantity")
-    public boolean increaseQuantity(@RequestParam("pid")Integer pid , @RequestParam("quantity")Integer quantity);
-
     @GetMapping("/updateQuantity")
     public boolean updateQuantity( @RequestParam("pid")Integer pid ,@RequestParam("quantity") Integer quantity);
 
-    @GetMapping("/decreaseFreeze")
-    public boolean decreaseFreeze( @RequestParam("pid")Integer pid , @RequestParam("quantity")Integer quantity);
-
-    @GetMapping("/increaseFreeze")
-    public boolean increaseFreeze( @RequestParam("pid")Integer pid ,@RequestParam("quantity") Integer quantity);
-
     @GetMapping("/updateFreeze")
-    public boolean updateFreeze( @RequestParam("pid")Integer pid ,@RequestParam("quantity") Integer quantity);
+    public boolean updateFreeze( @RequestParam("pid")Integer pid ,@RequestParam("freeze") Integer freeze);
+
+    @GetMapping("/releaseQuantity")
+    public boolean releaseQuantity( @RequestParam("pid")Integer pid ,@RequestParam("quantity") Integer quantity);
 
 }

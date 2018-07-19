@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("orderServiceCancle")
+@Transactional
 public class OrderServiceCancle implements IOrderService {
 
     @Autowired
@@ -23,9 +24,8 @@ public class OrderServiceCancle implements IOrderService {
     private ProductFeignService productFeignService;
 
     @Override
-    @Transactional
     public Order createOrder(Integer uid, Integer pid, Integer quantity) {
-        productFeignService.increaseQuantity( pid , quantity );
+        productFeignService.updateFreeze( pid , quantity );
         return null;
     }
 
@@ -33,7 +33,7 @@ public class OrderServiceCancle implements IOrderService {
     public boolean payOrder(Integer oid) {
         Order order = orderDao.getOne( oid );
         UserDto user = userFeignService.selectOne( order.getUid() );
-        if( ! userFeignService.increaseAmount( order.getUid() , order.getTotalPrice() )){
+        if( ! userFeignService.updateFreeze( order.getUid() , order.getTotalPrice() )){
             throw new RuntimeException("恢复余额失败");
         }
         return true;
@@ -42,7 +42,7 @@ public class OrderServiceCancle implements IOrderService {
     @Override
     public boolean cancleOrder(Integer oid) {
         Order order = orderDao.getOne( oid );
-        if( ! productFeignService.increaseFreeze( order.getPid() , order.getQuantity() )){
+        if( ! productFeignService.updateQuantity( order.getPid() , order.getQuantity() )){
             throw new RuntimeException("恢复冻结失败");
         }
         return true;
@@ -50,6 +50,6 @@ public class OrderServiceCancle implements IOrderService {
 
     @Override
     public Order selectOne(Integer oid) {
-        return null;
+        return orderDao.getOne( oid );
     }
 }

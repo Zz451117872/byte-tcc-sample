@@ -13,12 +13,9 @@ public interface UserFeignService {
     @GetMapping("/selectOne")
     public UserDto selectOne(@RequestParam("uid")Integer uid);
 
-    @GetMapping("/decreaseAmount")
-    public boolean decreaseAmount(@RequestParam("uid") Integer uid, @RequestParam("amount")Integer amount);
-
-    @GetMapping("/increaseAmount")
-    public boolean increaseAmount( @RequestParam("uid")Integer uid, @RequestParam("amount")Integer amount);
-
     @GetMapping("/updateAmount")
     public boolean updateAmount( @RequestParam("uid")Integer uid, @RequestParam("amount")Integer amount);
+
+    @GetMapping("/updateFreeze")
+    public boolean updateFreeze( @RequestParam("uid")Integer uid, @RequestParam("freeze")Integer freeze);
 }
